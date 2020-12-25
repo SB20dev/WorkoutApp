@@ -1,0 +1,16 @@
+{
+    "env": {
+      "es6": true,
+      "browser": true,
+      "jquery": true
+    },
+    "rules": {},
+    "parser": "babel-eslint",
+    "plugins": [
+      "react"
+    ],
+    "ecmaFeatures": {
+      "arrowFunctions": true,
+      "jsx": true
+    }
+}
