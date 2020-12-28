@@ -15,10 +15,12 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "pong")
 	}).Methods("GET")
+
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(
 		http.FileServer(dir))
 	fmt.Println("service start")
+
 	http.ListenAndServe(":8080", router)
 }
 
