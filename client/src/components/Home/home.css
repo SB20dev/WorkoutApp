@@ -7,3 +7,23 @@
     margin: 15px;
     border: solid;
 }
+
+.commit-and-suggest {
+    display: flex;
+    justify-content: center;
+    margin: 10% 0;
+}
+
+.commit-and-suggest .commitment-overview {
+    margin-right: 10%
+}
+
+.commit-and-suggest .suggestion {
+    margin-left: 10%;
+}
+
+.history {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10%;
+}
