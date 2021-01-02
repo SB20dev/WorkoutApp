@@ -7,7 +7,7 @@ import CombinedReducer from  './reducers/CombinedReducer'
 
 import Root from './components/Root'
 import createSagaMiddleware from 'redux-saga';
-import rootSaga from './saga/Saga';
+import rootSaga from './saga/RootSaga';
 
 import './common.css'
 

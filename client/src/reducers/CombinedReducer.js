@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import SampleCountReducer from './SampleCountReducer'
-import PingReducer from './SamplePingReducer'
+import CommitmentReducer from './CommitmentReducer'
+import MenuReducer from './MenuReducer'
 
 export default combineReducers({
-    count: SampleCountReducer,
-    ping: PingReducer
+    commitment: CommitmentReducer,
+    menu: MenuReducer
 })

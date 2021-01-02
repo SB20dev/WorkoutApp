@@ -1,5 +1,4 @@
 import React from 'react'
-//import { ConnectedRouter as Router } from 'react-router-redux'
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom'
 import Top from './Top/Top'
 import SignUp from './SignUp/SignUp'
@@ -13,7 +12,7 @@ import NotFound from './NotFound/NotFound'
 export default props => (
     <Router>
         <Switch>
-            <Route path="sign" component={SignRoute} />
+            <Route path="/sign" component={SignRoute} />
             <Route component={ContentRoute} />
         </Switch>
     </Router>
@@ -30,7 +29,9 @@ const ContentRoute = props => (
     <div>
         <nav>
             <div className="nav-left">
-                <div className="logo">ロゴ</div>
+                <div className="logo">
+                    <Link to="/">ロゴ</Link>
+                </div>
                 <div className="nav-list-container">
                     <ul className="nav-list">
                         <li>
