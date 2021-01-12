@@ -1,0 +1,31 @@
+version: '2.0'
+services:
+  workout_ap_development:
+    build:
+      context: ..
+      dockerfile: ./docker/AP/Dockerfile.development
+    image: workout_ap_development
+    volumes:
+      - ../public:/usr/local/workout/public
+      - ../db:/usr/local/workout/db
+      - ../server/bin/server:/usr/local/workout/server/bin/server
+      - ./AP/startup.sh:/usr/local/workout/script/startup.sh
+    ports:
+      - 8082:8081
+    container_name: workout_ap_development
+    tty: true
+    depends_on:
+      - workout_db_development
+
+  workout_db_development:
+    build:
+      context: ..
+      dockerfile: ./docker/DB/Dockerfile.development
+    image: workout_db_development
+    volumes:
+      - ./DB/data:/var/lib/postgres
+      - ./DB/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5433:5433
+    container_name: workout_db_development
+    tty: true
