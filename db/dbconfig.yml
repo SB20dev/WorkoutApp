@@ -1,5 +1,8 @@
 development:
   dialect: postgres
-  datasource: host=localhost user=workout port=5432 password=workout sslmode=disable
+  datasource: host=workout_db_development user=workout password=workout sslmode=disable
   dir: migrations
   table: migrations
+
+# production:
+#   dialect: postgres

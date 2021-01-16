@@ -1,0 +1,8 @@
+FROM postgres:13.1-alpine
+
+ENV LANG ja_JP.utf8
+ENV POSTGRES_PASSWORD postgres
+
+COPY docker/DB/init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5433

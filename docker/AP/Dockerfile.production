@@ -1,0 +1,26 @@
+FROM golang:1.15.6-alpine3.12
+
+ENV GO_ENV production
+
+RUN mkdir /usr/local/workout && \
+    mkdir /usr/local/workout/public && \
+    mkdir -p /usr/local/workout/server/bin && \
+    mkdir /usr/local/workout/db && \
+    mkdir /usr/local/workout/script && \
+    apk update && \
+    apk add --no-cache gcc musl-dev git && \
+    go get -u github.com/rubenv/sql-migrate/... && \
+# alpineだとgoのバイナリが実行できない問題があるらしいので対応(https://blog.kozakana.net/2019/09/go-binary-not-found/)
+    mkdir /lib64 && \
+    ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+
+WORKDIR /usr/local/workout/
+
+COPY public/ public/
+COPY server/bin/server server/bin/
+COPY db/ db/
+COPY docker/AP/startup.sh script/
+
+EXPOSE 8081
+
+CMD ./script/startup.sh

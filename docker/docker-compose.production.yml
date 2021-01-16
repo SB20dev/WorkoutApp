@@ -1,0 +1,25 @@
+version: '2.0'
+services:
+  workout_ap_production:
+    build:
+      context: ..
+      dockerfile: ./docker/AP/Dockerfile.production
+    image: workout_ap_production
+    ports:
+      - 8082:8081
+    container_name: workout_ap_production
+    tty: true
+    depends_on:
+      - workout_db_production
+
+  workout_db_production:
+    build:
+      context: ..
+      dockerfile: ./docker/DB/Dockerfile.production
+    image: workout_db_production
+    volumes:
+      - ./DB/data:/var/lib/postgres
+    ports:
+      - 5433:5433
+    container_name: workout_db_production
+    tty: true
