@@ -1,12 +1,13 @@
 FROM golang:1.15.6-alpine3.12
 
-ENV GO_ENV development
+ENV ENV development
 
 RUN mkdir /usr/local/workout && \
     mkdir /usr/local/workout/public && \
     mkdir -p /usr/local/workout/server/bin && \
     mkdir /usr/local/workout/db && \
     mkdir /usr/local/workout/script && \
+    mkdir /usr/local/workout/log && \
     apk update && \
     apk add --no-cache curl gcc musl-dev git && \
     go get -u github.com/rubenv/sql-migrate/... && \

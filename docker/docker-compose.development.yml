@@ -9,7 +9,9 @@ services:
       - ../public:/usr/local/workout/public
       - ../db:/usr/local/workout/db
       - ../server/bin/server:/usr/local/workout/server/bin/server
+      - ../server/development.env:/usr/local/workout/server/development.env
       - ./AP/startup.sh:/usr/local/workout/script/startup.sh
+      - ./AP/log:/usr/local/workout/log
     ports:
       - 8082:8081
     container_name: workout_ap_development
@@ -23,7 +25,7 @@ services:
       dockerfile: ./docker/DB/Dockerfile.development
     image: workout_db_development
     volumes:
-      - ./DB/data:/var/lib/postgres
+      - ./DB/data:/var/lib/postgresql/data
       - ./DB/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5433:5433
