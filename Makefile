@@ -22,4 +22,4 @@ docker/down:
 
 docker/rebuild:
 	docker image rm workout_ap_${ENV} workout_db_${ENV}
-	docker-compose -f ./docker/docker-compose.${ENV}.yml build
+	sudo docker-compose -f ./docker/docker-compose.${ENV}.yml build
