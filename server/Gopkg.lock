@@ -2,12 +2,28 @@
 
 
 [[projects]]
-  digest = "1:25ebe6496abb289ef977c081b2d49f56dd97c32db4ca083d37f95923909ced02"
+  digest = "1:2b3609bed06a622fed186edf15d7d4c827942924b81c43e173f58e430314e3ad"
+  name = "github.com/auth0/go-jwt-middleware"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1c6db3ceac5f4d28b35ee4b9949a3f80030aa6a3"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:3be7b7206a3fd8686175fd974eb33a1c9dd109c149bdf19801e32b8f48733530"
+  name = "github.com/form3tech-oss/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9162a5abdbc046b7c8b03ee90052cee67e25caa7"
+  version = "v3.2.2"
+
+[[projects]]
+  digest = "1:6078383dbb7405bfa3ce16957f37564e3b716afa29b6eb45ffdb6674624d1e0d"
   name = "github.com/gorilla/mux"
   packages = ["."]
   pruneopts = "UT"
-  revision = "75dcda0896e109a2a22c9315bca3bb21b87b2ba5"
-  version = "v1.7.4"
+  revision = "98cb6bf42e086f6af920b965c38cacc07402d51b"
+  version = "v1.8.0"
 
 [[projects]]
   digest = "1:e505c26e1b30391dd9cd96727f78cd667bcf10fef7c1548ca754d4f50905a55e"
@@ -29,6 +45,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
+
+[[projects]]
   digest = "1:1f56b7e0292f71c450ab897beb96e9978f22b46da14f2d1add4bcfee669c2d3f"
   name = "github.com/lib/pq"
   packages = [
@@ -42,6 +66,17 @@
   version = "v1.9.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:9d5b5d543996dd584da1db1e0de1926f3e4c3a8dba0fa2f8db70f3ebee2342e0"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish",
+  ]
+  pruneopts = "UT"
+  revision = "eec23a3978adcfd26c29f4153eaa3e3d9b2cc53a"
+
+[[projects]]
   digest = "1:5054a1f394226de9e6ddc47b0ba77e35092a4112f4a1cd9cb94aba1f5bdc3ec6"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -53,9 +88,13 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/auth0/go-jwt-middleware",
+    "github.com/form3tech-oss/jwt-go",
     "github.com/gorilla/mux",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
+    "github.com/joho/godotenv",
+    "golang.org/x/crypto/bcrypt",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"

@@ -1,8 +1,9 @@
 
 -- +migrate Up
 CREATE TABLE IF NOT EXISTS "users" (
-    "id" varchar(32) primary key,
-    "hashed_pw" bytea,
+    "system_id" serial primary key,
+    "id" varchar(32) unique not null,
+    "password" varchar(100) not null,
     "last_login" timestamp with time zone,
     "created" timestamp with time zone
 );
