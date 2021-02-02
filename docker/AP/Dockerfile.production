@@ -1,6 +1,6 @@
 FROM golang:1.15.6-alpine3.12
 
-ENV GO_ENV production
+ENV ENV production
 
 RUN mkdir /usr/local/workout && \
     mkdir /usr/local/workout/public && \
