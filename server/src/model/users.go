@@ -18,9 +18,9 @@ func CreateUser(db *gorm.DB, user *User) *gorm.DB {
 }
 
 func ReadUserByID(db *gorm.DB, id string) *User {
-	var user *User
-	db.Where(&User{ID: id}).Find(user)
-	return user
+	var user User
+	db.Where(&User{ID: id}).First(&user, id)
+	return &user
 }
 
 func UpdateLastLogin(db *gorm.DB, id string) *gorm.DB {

@@ -44,9 +44,10 @@ func getRouter(db *gorm.DB) *mux.Router {
 		fmt.Fprintln(w, "pong")
 	}).Methods("GET")
 
+	// サインイン、サインアップ
 	userController := &controller.UserController{DB: db}
-	router.Handle("/api/signin", helper.Handler(userController.SignIn)).Methods("POST")
-	router.Handle("/api/signup", helper.Handler(userController.SignUp)).Methods("POST")
+	router.Handle("/api/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
+	router.Handle("/api/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
 
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(
