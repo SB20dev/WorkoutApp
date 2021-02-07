@@ -38,6 +38,7 @@ func main() {
 
 func getRouter(db *gorm.DB) *mux.Router {
 	router := mux.NewRouter()
+	router.PathPrefix("/api")
 
 	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -46,8 +47,8 @@ func getRouter(db *gorm.DB) *mux.Router {
 
 	// サインイン、サインアップ
 	userController := &controller.UserController{DB: db}
-	router.Handle("/api/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
-	router.Handle("/api/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
+	router.Handle("/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
+	router.Handle("/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
 
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(

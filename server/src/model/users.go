@@ -17,7 +17,7 @@ func CreateUser(db *gorm.DB, user *User) *gorm.DB {
 	return db.Create(user)
 }
 
-func ReadUserByID(db *gorm.DB, id string) *User {
+func FetchUserByID(db *gorm.DB, id string) *User {
 	var user User
 	db.Where(&User{ID: id}).First(&user, id)
 	return &user

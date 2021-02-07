@@ -25,7 +25,7 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	user := model.ReadUserByID(u.DB, input.ID)
+	user := model.FetchUserByID(u.DB, input.ID)
 	if user == nil {
 		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct")
 	}
