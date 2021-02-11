@@ -45,3 +45,8 @@ type handlerFunc func(w http.ResponseWriter, r *http.Request) error
 func AuthHandler(fn handlerFunc) http.Handler {
 	return jwtMiddleware.Handler(Handler(fn))
 }
+
+func GetClaim(r *http.Request, key string) interface{} {
+	claims := r.Context().Value("user").(*jwt.Token).Claims.(jwt.MapClaims)
+	return claims[key]
+}
