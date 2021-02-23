@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserController struct {
@@ -72,8 +72,8 @@ func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
 	user.Password = string(hash)
 
 	// DB格納
-	result := model.CreateUser(u.DB, &user)
-	if err := result.Error; err != nil {
+	err = model.CreateUser(u.DB, &user)
+	if err != nil {
 		return helper.CreateHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
