@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		env = "development"
 	}
 	db := connectDB(getProjectRootDir()+"db/dbconfig.yml", env)
-	defer db.Close()
+
 	router := getRouter(db)
 	log.Print("service start")
 
@@ -48,6 +48,16 @@ func getRouter(db *gorm.DB) *mux.Router {
 	userController := &controller.UserController{DB: db}
 	router.Handle("/api/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
 	router.Handle("/api/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
+
+	// コミットメント
+	commitmentController := &controller.CommitmentController{DB: db}
+	router.Handle("/api/commitment/totalScore", helper.AuthHandler(commitmentController.GetTotalScore)).Methods("GET")
+	router.Handle("/api/commitment/count", helper.AuthHandler(commitmentController.GetCount)).Methods("GET")
+	router.Handle("/api/commitment/histories", helper.AuthHandler(commitmentController.GetHistory)).
+		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
+	router.Handle("/api/commitment/detail", helper.AuthHandler(commitmentController.GetDetail)).
+		Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
+	router.Handle("/api/commitment/post", helper.AuthHandler(commitmentController.Post)).Methods("POST")
 
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(

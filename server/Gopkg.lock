@@ -26,23 +26,20 @@
   version = "v1.8.0"
 
 [[projects]]
-  digest = "1:e505c26e1b30391dd9cd96727f78cd667bcf10fef7c1548ca754d4f50905a55e"
-  name = "github.com/jinzhu/gorm"
-  packages = [
-    ".",
-    "dialects/postgres",
-  ]
-  pruneopts = "UT"
-  revision = "6f4358eeb5e3df768c182ae54d90ceacff0880a8"
-  version = "v1.9.16"
-
-[[projects]]
   digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
   name = "github.com/jinzhu/inflection"
   packages = ["."]
   pruneopts = "UT"
   revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:3458e5dd5934a9c852e11a4ea54a07de091fdad4c36d0ac033bb90bc16b0a046"
+  name = "github.com/jinzhu/now"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7e7333ac029d4aad7e88500a30889fcd22489425"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
@@ -53,11 +50,10 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:1f56b7e0292f71c450ab897beb96e9978f22b46da14f2d1add4bcfee669c2d3f"
+  digest = "1:62f794e53445d22aa4d1709a9123053b9bf7c3284571b5b807f80d57e1648844"
   name = "github.com/lib/pq"
   packages = [
     ".",
-    "hstore",
     "oid",
     "scram",
   ]
@@ -74,7 +70,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "eec23a3978adcfd26c29f4153eaa3e3d9b2cc53a"
+  revision = "5ea612d1eb830b38bc4e914e37f55311eb58adce"
 
 [[projects]]
   digest = "1:5054a1f394226de9e6ddc47b0ba77e35092a4112f4a1cd9cb94aba1f5bdc3ec6"
@@ -84,6 +80,30 @@
   revision = "7649d4548cb53a614db133b2a8ac1f31859dda8c"
   version = "v2.4.0"
 
+[[projects]]
+  digest = "1:cf0eeff871fb146d0a77cfb6eecc38e79f7458fe6d05726ee59654d9799711ca"
+  name = "gorm.io/driver/postgres"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2591a12c4fdf62e81734996d0361db21fe90ae45"
+  version = "v0.2.4"
+
+[[projects]]
+  digest = "1:5673b3b48d14317f8361d1908f18baefb341827ee3e6d21022882433ca5f4f8d"
+  name = "gorm.io/gorm"
+  packages = [
+    ".",
+    "callbacks",
+    "clause",
+    "logger",
+    "migrator",
+    "schema",
+    "utils",
+  ]
+  pruneopts = "UT"
+  revision = "7f198ead0e716265acd3491925e340bfae758e95"
+  version = "v1.20.12"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -91,11 +111,11 @@
     "github.com/auth0/go-jwt-middleware",
     "github.com/form3tech-oss/jwt-go",
     "github.com/gorilla/mux",
-    "github.com/jinzhu/gorm",
-    "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/joho/godotenv",
     "golang.org/x/crypto/bcrypt",
     "gopkg.in/yaml.v2",
+    "gorm.io/driver/postgres",
+    "gorm.io/gorm",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

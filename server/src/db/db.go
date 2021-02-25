@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"gopkg.in/yaml.v2"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type Config struct {
@@ -16,7 +16,8 @@ type Config struct {
 type Configs map[string]Config
 
 func (c *Configs) Open(env string) (*gorm.DB, error) {
-	db, err := gorm.Open("postgres", (*c)[env].Datasource)
+	dsn := (*c)[env].Datasource
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

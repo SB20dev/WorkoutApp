@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -13,13 +13,13 @@ type User struct {
 	Created   time.Time `json:created`
 }
 
-func CreateUser(db *gorm.DB, user *User) *gorm.DB {
-	return db.Create(user)
+func CreateUser(db *gorm.DB, user *User) error {
+	return db.Create(user).Error
 }
 
-func ReadUserByID(db *gorm.DB, id string) *User {
+func FetchUserByID(db *gorm.DB, id string) *User {
 	var user User
-	db.Where(&User{ID: id}).First(&user, id)
+	db.Where(&User{ID: id}).First(&user)
 	return &user
 }
 
