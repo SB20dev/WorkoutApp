@@ -5,7 +5,7 @@ build/client:
 
 build/server:
 	cd ./server; go mod tidy;
-	cd ./src; dep ensure; GOOS=linux GOARCH=amd64 go build -o ../bin/server
+	cd ./server/src; GOOS=linux GOARCH=amd64 go build -o ../bin/server
 
 build:
 	$(MAKE) build/client
