@@ -11,8 +11,8 @@ build:
 	$(MAKE) build/client
 	$(MAKE) build/server	
 
-run:
-	./server/bin/server
+docker/build:
+	sudo docker-compose -f ./docker/docker-compose.${ENV}.yml build
 
 docker/up:
 	docker-compose -f ./docker/docker-compose.${ENV}.yml up -d
