@@ -15,38 +15,23 @@ type CommitmentController struct {
 	DB *gorm.DB
 }
 
-func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Request) error {
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
-	}
+func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Request, userID string) error {
 	totalScore := model.FetchTotalCommitmentScore(c.DB, userID)
-
 	rtn := map[string]int{
 		"total": totalScore,
 	}
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request) error {
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
-	}
+func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request, userID string) error {
 	count := model.FetchCommitmentCount(c.DB, userID)
-
 	rtn := map[string]int{
 		"count": count,
 	}
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request) error {
-	// userID
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context.")
-	}
+func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request, userID string) error {
 	// offset, num
 	q := r.URL.Query()
 	offset, offsetErr := strconv.Atoi(q.Get("offset"))
@@ -66,7 +51,7 @@ func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request) error {
+func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request, userID string) error {
 	q := r.URL.Query()
 	commitment_id, err := strconv.Atoi(q.Get("commitment_id"))
 	if err != nil {
@@ -81,13 +66,7 @@ func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request)
 	return helper.JSON(w, http.StatusOK, commitmentDetail)
 }
 
-func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request) error {
-	// userID
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context.")
-	}
-
+func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request, userID string) error {
 	var body struct {
 		menus []model.CommitmentMenu `json:menus`
 	}

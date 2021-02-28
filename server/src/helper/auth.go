@@ -40,10 +40,16 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 	SigningMethod: jwt.SigningMethodHS256,
 })
 
-type handlerFunc func(w http.ResponseWriter, r *http.Request) error
+func AuthHandler(fn func(w http.ResponseWriter, r *http.Request, userID string) error) http.Handler {
 
-func AuthHandler(fn handlerFunc) http.Handler {
-	return jwtMiddleware.Handler(Handler(fn))
+	funcWithUserID := func(w http.ResponseWriter, r *http.Request) error {
+		userID, ok := GetClaim(r, "id").(string)
+		if !ok {
+			return CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
+		}
+		return fn(w, r, userID)
+	}
+	return jwtMiddleware.Handler(Handler(funcWithUserID))
 }
 
 func GetClaim(r *http.Request, key string) interface{} {
