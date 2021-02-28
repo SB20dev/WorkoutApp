@@ -4,8 +4,8 @@ build/client:
 	cd ./client; yarn run build
 
 build/server:
-	which dep || go get -v -u github.com/golang/dep/cmd/dep
-	cd ./server/src; dep ensure; GOOS=linux GOARCH=amd64 go build -o ../bin/server
+	cd ./server; go mod tidy;
+	cd ./src; dep ensure; GOOS=linux GOARCH=amd64 go build -o ../bin/server
 
 build:
 	$(MAKE) build/client

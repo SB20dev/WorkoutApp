@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"WorkoutApp/server/src/helper"
-	"WorkoutApp/server/src/model"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
+	"workout/src/helper"
+	"workout/src/model"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

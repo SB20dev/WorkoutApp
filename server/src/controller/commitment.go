@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"WorkoutApp/server/src/helper"
-	"WorkoutApp/server/src/model"
 	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
+	"workout/src/helper"
+	"workout/src/model"
 
 	"gorm.io/gorm"
 )

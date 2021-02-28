@@ -1,14 +1,14 @@
 package main
 
 import (
-	"WorkoutApp/server/src/controller"
-	"WorkoutApp/server/src/db"
-	"WorkoutApp/server/src/helper"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"workout/src/controller"
+	"workout/src/db"
+	"workout/src/helper"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
