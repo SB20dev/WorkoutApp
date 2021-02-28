@@ -1,10 +1,10 @@
 package helper
 
 import (
-	"WorkoutApp/server/src/model"
 	"net/http"
 	"os"
 	"time"
+	"workout/src/model"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/form3tech-oss/jwt-go"
