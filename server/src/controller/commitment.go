@@ -16,7 +16,11 @@ type CommitmentController struct {
 }
 
 func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Request, userID string) error {
-	totalScore := model.FetchTotalCommitmentScore(c.DB, userID)
+	totalScore, err := model.FetchTotalCommitmentScore(c.DB, userID)
+	if err != nil {
+		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch total score.")
+	}
+
 	rtn := map[string]int{
 		"total": totalScore,
 	}
@@ -24,7 +28,10 @@ func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Requ
 }
 
 func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request, userID string) error {
-	count := model.FetchCommitmentCount(c.DB, userID)
+	count, err := model.FetchCommitmentCount(c.DB, userID)
+	if err != nil {
+		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch count.")
+	}
 	rtn := map[string]int{
 		"count": count,
 	}

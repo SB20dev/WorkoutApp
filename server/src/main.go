@@ -59,6 +59,14 @@ func getRouter(db *gorm.DB) *mux.Router {
 		Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
 	router.Handle("/api/commitment/post", helper.AuthHandler(commitmentController.Post)).Methods("POST")
 
+	// メニュー
+	menuController := &controller.MenuController{DB: db}
+	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetByID)).
+		Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
+	// router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetDetail)).
+	// 	Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
+	// router.Handle("api/menu/post", helper.AuthHandler(menuController.Post)).Methods("POST")
+
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(
 		http.FileServer(dir))
