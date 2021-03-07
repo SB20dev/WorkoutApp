@@ -20,20 +20,26 @@ type CommitmentMenu struct {
 	Amount       string `json:amount`
 }
 
-func FetchTotalCommitmentScore(db *gorm.DB, userID string) int {
+func FetchTotalCommitmentScore(db *gorm.DB, userID string) (int, error) {
 	var result struct {
 		total int `json:total`
 	}
-	db.Table("commitments").Select("sum(score) as total").Where("user_id", userID).First(&result)
-	return result.total
+	res := db.Table("commitments").Select("sum(score) as total").Where("user_id", userID).First(&result)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return result.total, nil
 }
 
-func FetchCommitmentCount(db *gorm.DB, userID string) int {
+func FetchCommitmentCount(db *gorm.DB, userID string) (int, error) {
 	var result struct {
 		count int `json:count`
 	}
-	db.Table("commitments").Select("count(score) as count").Where("user_id", userID).First(&result)
-	return result.count
+	res := db.Table("commitments").Select("count(*) as count").Where("user_id", userID).First(&result)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return result.count, nil
 }
 
 func FetchCommitmentHistories(db *gorm.DB, userID string, offset int, num int) ([]Commitment, error) {

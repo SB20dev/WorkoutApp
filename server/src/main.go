@@ -1,14 +1,14 @@
 package main
 
 import (
-	"WorkoutApp/server/src/controller"
-	"WorkoutApp/server/src/db"
-	"WorkoutApp/server/src/helper"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"workout/src/controller"
+	"workout/src/db"
+	"workout/src/helper"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -58,6 +58,14 @@ func getRouter(db *gorm.DB) *mux.Router {
 	router.Handle("/api/commitment/detail", helper.AuthHandler(commitmentController.GetDetail)).
 		Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
 	router.Handle("/api/commitment/post", helper.AuthHandler(commitmentController.Post)).Methods("POST")
+
+	// メニュー
+	menuController := &controller.MenuController{DB: db}
+	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetByID)).
+		Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
+	// router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetDetail)).
+	// 	Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
+	// router.Handle("api/menu/post", helper.AuthHandler(menuController.Post)).Methods("POST")
 
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(

@@ -1,10 +1,10 @@
 package helper
 
 import (
-	"WorkoutApp/server/src/model"
 	"net/http"
 	"os"
 	"time"
+	"workout/src/model"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/form3tech-oss/jwt-go"
@@ -41,7 +41,6 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 })
 
 func AuthHandler(fn func(w http.ResponseWriter, r *http.Request, userID string) error) http.Handler {
-
 	funcWithUserID := func(w http.ResponseWriter, r *http.Request) error {
 		userID, ok := GetClaim(r, "id").(string)
 		if !ok {
