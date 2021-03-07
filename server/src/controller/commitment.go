@@ -32,6 +32,7 @@ func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch count.")
 	}
+
 	rtn := map[string]int{
 		"count": count,
 	}
