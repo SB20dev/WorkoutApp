@@ -2,13 +2,7 @@ FROM golang:1.15.6-alpine3.12
 
 ENV ENV development
 
-RUN mkdir /usr/local/workout && \
-    mkdir /usr/local/workout/public && \
-    mkdir -p /usr/local/workout/server/bin && \
-    mkdir /usr/local/workout/db && \
-    mkdir /usr/local/workout/script && \
-    mkdir /usr/local/workout/log && \
-    apk update && \
+RUN apk update && \
     apk add --no-cache curl gcc musl-dev git && \
     go get -u github.com/rubenv/sql-migrate/... && \
 # alpineだとgoのバイナリが実行できない問題があるらしいので対応(https://blog.kozakana.net/2019/09/go-binary-not-found/)
