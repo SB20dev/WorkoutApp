@@ -15,11 +15,37 @@ import (
 	"gorm.io/gorm"
 )
 
+type spaHandler struct {
+	staticPath string
+	indexPath  string
+}
+
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	path, err := filepath.Abs(r.URL.Path)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	path = filepath.Join(h.staticPath, path)
+
+	_, err = os.Stat(path)
+	if os.IsNotExist(err) {
+		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+}
+
 func main() {
 
 	env := os.Getenv("ENV")
 
-	err := godotenv.Load(getProjectRootDir() + "server/" + env + ".env")
+	err := godotenv.Load(filepath.Join(getProjectRootDir(), "server", env+".env"))
 	if err != nil {
 		// これでいいんだろうか...
 		panic(nil)
@@ -28,7 +54,7 @@ func main() {
 	if env == "" {
 		env = "development"
 	}
-	db := connectDB(getProjectRootDir()+"db/dbconfig.yml", env)
+	db := connectDB(filepath.Join(getProjectRootDir(), "db/dbconfig.yml"), env)
 
 	router := getRouter(db)
 	log.Print("service start")
@@ -71,6 +97,12 @@ func getRouter(db *gorm.DB) *mux.Router {
 	router.PathPrefix("/").Handler(
 		http.FileServer(dir))
 
+	spa := spaHandler{
+		staticPath: filepath.Join(getProjectRootDir(), "public"),
+		indexPath:  "index.html",
+	}
+	router.PathPrefix("/").Handler(spa)
+
 	return router
 }
 
@@ -88,6 +120,6 @@ func connectDB(filePath string, env string) *gorm.DB {
 
 func getProjectRootDir() string {
 	exe, _ := os.Executable()
-	projectRootDir := filepath.Dir(exe) + "/../../"
+	projectRootDir := filepath.Join(filepath.Dir(exe), "../..")
 	return projectRootDir
 }
