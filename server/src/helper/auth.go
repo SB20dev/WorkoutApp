@@ -4,13 +4,12 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"workout/src/model"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/form3tech-oss/jwt-go"
 )
 
-func CreateToken(user *model.User) (string, error) {
+func CreateToken(id string) (string, error) {
 
 	// Token を作成
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -20,7 +19,7 @@ func CreateToken(user *model.User) (string, error) {
 		"iat": time.Now(),
 		"exp": time.Now().Add(time.Hour * 1).Unix(),
 		// private claims
-		"id": user.ID,
+		"id": id,
 	})
 
 	signature := os.Getenv("SIGNATURE")

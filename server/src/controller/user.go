@@ -37,7 +37,7 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// トークン生成
-	tokenStr, err := helper.CreateToken(user)
+	tokenStr, err := helper.CreateToken(user.ID)
 	if err != nil {
 		return err
 	}

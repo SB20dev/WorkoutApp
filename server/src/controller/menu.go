@@ -19,7 +19,7 @@ func (c *MenuController) GetCount(w http.ResponseWriter, r *http.Request, userID
 		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch count.")
 	}
 
-	rtn := map[string]int{
+	rtn := map[string]int64{
 		"count": count,
 	}
 	return helper.JSON(w, http.StatusOK, rtn)
