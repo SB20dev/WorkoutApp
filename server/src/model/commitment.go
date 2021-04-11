@@ -83,7 +83,7 @@ func FetchCommitmentDetail(db *gorm.DB, commitmentID int) (interface{}, error) {
 	return rtn, nil
 }
 
-func CreateCommitment(db *gorm.DB, commitment *Commitment, menus []CommitmentMenu) error {
+func CreateCommitment(db *gorm.DB, commitment *Commitment, commitmentMenus []CommitmentMenu) error {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// insert into commitments
 		err := db.Create(commitment).Error
@@ -91,7 +91,10 @@ func CreateCommitment(db *gorm.DB, commitment *Commitment, menus []CommitmentMen
 			return err
 		}
 		//insert into commitment_menus
-		err = db.Create(menus).Error
+		for _, menu := range commitmentMenus {
+			menu.CommitmentID = commitment.ID
+		}
+		err = db.Create(commitmentMenus).Error
 		if err != nil {
 			return err
 		}

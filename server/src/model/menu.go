@@ -12,14 +12,14 @@ type Menu struct {
 }
 
 type MenuPart struct {
-	ID     int    `json:"id"`
-	MenuID string `json:"menu_id"`
-	PartID string `json:"part_id"`
+	ID     int `json:"id"`
+	MenuID int `json:"menu_id"`
+	PartID int `json:"part_id"`
 }
 
 type IntermediateMenu struct {
 	Menu
-	PartID string `json:"part_id"`
+	PartID int `json:"part_id"`
 }
 
 type JoinedMenu struct {
@@ -42,34 +42,65 @@ func FetchMenuCount(db *gorm.DB, userID string) (int64, error) {
 	return count, nil
 }
 
-func FetchMenuByID(db *gorm.DB, menuID int) (interface{}, error) {
-	parts, err := GetParts(db)
-	if err != nil {
-		return nil, err
-	}
-
-	menus := []IntermediateMenu{}
-	res := db.Table("menus").Select("menus.id, menus.user_id, menus.name, menu_parts.part_id").
-		Joins("join menu_parts on menus.id = menu_parts.menu_id").
-		Where("menus.id = ?", menuID).Scan(&menus)
-
-	if res.Error != nil {
-		return nil, res.Error
-	}
-
-	return joinMenuAndParts(menus, parts), nil
+func FetchMenuByID(db *gorm.DB, menuID int) (map[int]MenuContent, error) {
+	return fetchMenus(db, nil, nil, "menus.id = ?", menuID)
 }
 
-func FetchMenus(db *gorm.DB, userID string, offset int, limit int) (interface{}, error) {
+func FetchMenus(db *gorm.DB, userID string, offset int, limit int) (map[int]MenuContent, error) {
+	return fetchMenus(db, offset, limit, "menus.user_id = ?", userID)
+}
+
+func SearchMenus(db *gorm.DB, userID string, keyword string, limit int) (map[int]MenuContent, error) {
+	return fetchMenus(db, nil, limit, "menus.user_id = ? && menus.name = ?", userID, keyword)
+}
+
+func CreateMenus(db *gorm.DB, menu *Menu, parts []int) error {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// insert into menus
+		err := db.Create(menu).Error
+		if err != nil {
+			return err
+		}
+		//insert into commitment_menus
+		menuParts := []MenuPart{}
+		for _, part := range parts {
+			menuParts = append(menuParts, MenuPart{MenuID: menu.ID, PartID: part})
+		}
+		err = db.Create(menuParts).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func fetchMenus(db *gorm.DB, iOffset interface{}, iLimit interface{}, query interface{}, args ...interface{}) (map[int]MenuContent, error) {
 	parts, err := GetParts(db)
 	if err != nil {
 		return nil, err
 	}
 
-	menus := []IntermediateMenu{}
-	res := db.Table("menus").Select("menus.id, menus.user_id, menus.name, menu_parts.part_id").
+	tx := db.Table("menus").Select("menus.id, menus.user_id, menus.name, menu_parts.part_id").
 		Joins("join menu_parts on menus.id = menu_parts.menu_id").
-		Where("menus.user_id = ?", userID).Offset(offset).Limit(limit).Scan(&menus)
+		Where(query, args)
+	if iOffset != nil {
+		if offset, ok := iOffset.(int); ok {
+			tx = tx.Offset(offset)
+		}
+	}
+	if iLimit != nil {
+		if limit, ok := iLimit.(int); ok {
+			tx = tx.Limit(limit)
+		}
+	}
+
+	menus := []IntermediateMenu{}
+	res := tx.Scan(&menus)
 
 	if res.Error != nil {
 		return nil, res.Error

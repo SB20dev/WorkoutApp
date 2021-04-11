@@ -76,14 +76,14 @@ func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request,
 
 func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request, userID string) error {
 	var body struct {
-		menus []model.CommitmentMenu `json:menus`
+		menus []model.CommitmentMenu `json:"menus"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
 		return helper.CreateHTTPError(http.StatusBadRequest, "request body is invalid. parse failed")
-	} else if body.menus != nil && len(body.menus) == 0 {
-		return helper.CreateHTTPError(http.StatusBadRequest, "menu length equals zero or nil.")
+	} else if body.menus == nil || len(body.menus) == 0 {
+		return helper.CreateHTTPError(http.StatusBadRequest, "menu is nil or its length equals zero.")
 	}
 
 	// score
@@ -100,8 +100,7 @@ func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request, user
 	if err != nil {
 		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to create commitment.")
 	}
-
-	return nil
+	return helper.JSON(w, http.StatusOK, nil)
 }
 
 func calcCommitmentScore(menus []model.CommitmentMenu) int {

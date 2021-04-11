@@ -44,16 +44,17 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	env := os.Getenv("ENV")
+	if env == "" {
+		env = "development"
+	}
 
 	err := godotenv.Load(filepath.Join(getProjectRootDir(), "server", env+".env"))
 	if err != nil {
 		// これでいいんだろうか...
 		panic(nil)
 	}
+
 	// DB接続
-	if env == "" {
-		env = "development"
-	}
 	db := connectDB(filepath.Join(getProjectRootDir(), "db/dbconfig.yml"), env)
 
 	router := getRouter(db)
@@ -87,11 +88,14 @@ func getRouter(db *gorm.DB) *mux.Router {
 
 	// メニュー
 	menuController := &controller.MenuController{DB: db}
+	router.Handle("/api/menu/count", helper.AuthHandler(menuController.GetCount)).Methods("GET")
 	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetByID)).
 		Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
-	// router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetDetail)).
-	// 	Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
-	// router.Handle("api/menu/post", helper.AuthHandler(menuController.Post)).Methods("POST")
+	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetPartially)).
+		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
+	router.Handle("api/menu/search", helper.AuthHandler(menuController.Search)).
+		Queries("keyword", "{keyword:.+}").Methods("GET")
+	router.Handle("api/menu/post", helper.AuthHandler(menuController.Post)).Methods("POST")
 
 	dir := http.Dir(getProjectRootDir() + "public")
 	router.PathPrefix("/").Handler(

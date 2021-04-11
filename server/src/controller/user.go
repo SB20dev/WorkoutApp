@@ -77,8 +77,7 @@ func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
 		return helper.CreateHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	w.WriteHeader(http.StatusOK)
-	return nil
+	return helper.JSON(w, http.StatusOK, nil)
 }
 
 func validateInputs(user model.User) error {
