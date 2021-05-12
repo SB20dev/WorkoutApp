@@ -4,5 +4,11 @@ development:
   dir: migrations
   table: migrations
 
+test:
+  dialect: postgres
+  datasource: host=workout_db_test user=workout password=workout sslmode=disable
+  dir: migrations
+  table: migrations
+
 # production:
 #   dialect: postgres

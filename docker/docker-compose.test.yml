@@ -1,0 +1,32 @@
+version: '2.0'
+services:
+  workout_ap_test:
+    build:
+      context: ..
+      dockerfile: ./docker/AP/Dockerfile.test
+    image: workout_ap_test
+    volumes:
+      - ../public:/usr/local/workout/public
+      - ../db:/usr/local/workout/db
+      - ../server:/usr/local/workout/server
+      - ../server/test.env:/usr/local/workout/server/test.env
+      - ./AP/test.sh:/usr/local/workout/script/test.sh
+      - ./AP/log:/usr/local/workout/log
+    ports:
+      - 8082:8081
+    container_name: workout_ap_test
+    tty: true
+    depends_on:
+      - workout_db_test
+
+  workout_db_test:
+    build:
+      context: ..
+      dockerfile: ./docker/DB/Dockerfile.development
+    image: workout_db_test
+    volumes:
+      - ./DB/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5433:5433
+    container_name: workout_db_test
+    tty: true

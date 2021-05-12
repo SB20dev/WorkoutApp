@@ -84,7 +84,7 @@ func validateInputs(user model.User) error {
 
 	addErrorStr := func(str string, addition string) string {
 		if str != "" {
-			return str + "\n" + addition
+			return str + " " + addition
 		}
 		return addition
 	}
@@ -93,19 +93,25 @@ func validateInputs(user model.User) error {
 		minLength int = 8
 		maxLength int = 72
 	)
+
+	isInvalid := false
 	errorStr := ""
 	if user.ID == "" {
-		errorStr += "ID is empty"
+		errorStr += "ID is empty."
+		isInvalid = true
 	} else if len(user.ID) > maxLength || len(user.ID) < minLength {
-		errorStr += fmt.Sprintf("length of ID must be from %d to %d", minLength, maxLength)
+		errorStr += fmt.Sprintf("length of ID must be from %d to %d.", minLength, maxLength)
+		isInvalid = true
 	}
 	if user.Password == "" {
-		errorStr += addErrorStr(errorStr, "Passowrd is empty")
+		errorStr = addErrorStr(errorStr, "Password is empty.")
+		isInvalid = true
 	} else if len(user.Password) > maxLength || len(user.Password) < minLength {
-		errorStr += addErrorStr(errorStr, fmt.Sprintf("length of Password must be from %d to %d", minLength, maxLength))
+		errorStr = addErrorStr(errorStr, fmt.Sprintf("length of Password must be from %d to %d.", minLength, maxLength))
+		isInvalid = true
 	}
 
-	if errorStr == "" {
+	if !isInvalid {
 		return nil
 	}
 	return helper.CreateHTTPError(http.StatusBadRequest, errorStr)
