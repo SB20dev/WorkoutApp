@@ -7,10 +7,10 @@ import (
 )
 
 type User struct {
-	ID        string    `json:id`
-	Password  string    `json:password`
-	LastLogin time.Time `json:last_login`
-	Created   time.Time `json:created`
+	ID        string    `json:"id"`
+	Password  string    `json:"password"`
+	LastLogin time.Time `json:"last_login"`
+	Created   time.Time `json:"created"`
 }
 
 func CreateUser(db *gorm.DB, user *User) error {

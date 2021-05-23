@@ -15,12 +15,11 @@ type CommitmentController struct {
 	DB *gorm.DB
 }
 
-func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Request) error {
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
+func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Request, userID string) error {
+	totalScore, err := model.FetchTotalCommitmentScore(c.DB, userID)
+	if err != nil {
+		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch total score.")
 	}
-	totalScore := model.FetchTotalCommitmentScore(c.DB, userID)
 
 	rtn := map[string]int{
 		"total": totalScore,
@@ -28,25 +27,19 @@ func (c *CommitmentController) GetTotalScore(w http.ResponseWriter, r *http.Requ
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request) error {
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
+func (c *CommitmentController) GetCount(w http.ResponseWriter, r *http.Request, userID string) error {
+	count, err := model.FetchCommitmentCount(c.DB, userID)
+	if err != nil {
+		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch count.")
 	}
-	count := model.FetchCommitmentCount(c.DB, userID)
 
-	rtn := map[string]int{
+	rtn := map[string]int64{
 		"count": count,
 	}
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request) error {
-	// userID
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context.")
-	}
+func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request, userID string) error {
 	// offset, num
 	q := r.URL.Query()
 	offset, offsetErr := strconv.Atoi(q.Get("offset"))
@@ -66,7 +59,7 @@ func (c *CommitmentController) GetHistory(w http.ResponseWriter, r *http.Request
 	return helper.JSON(w, http.StatusOK, rtn)
 }
 
-func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request) error {
+func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request, userID string) error {
 	q := r.URL.Query()
 	commitment_id, err := strconv.Atoi(q.Get("commitment_id"))
 	if err != nil {
@@ -81,22 +74,16 @@ func (c *CommitmentController) GetDetail(w http.ResponseWriter, r *http.Request)
 	return helper.JSON(w, http.StatusOK, commitmentDetail)
 }
 
-func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request) error {
-	// userID
-	userID, ok := helper.GetClaim(r, "id").(string)
-	if !ok {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context.")
-	}
-
+func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request, userID string) error {
 	var body struct {
-		menus []model.CommitmentMenu `json:menus`
+		menus []model.CommitmentMenu `json:"menus"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
 		return helper.CreateHTTPError(http.StatusBadRequest, "request body is invalid. parse failed")
-	} else if body.menus != nil && len(body.menus) == 0 {
-		return helper.CreateHTTPError(http.StatusBadRequest, "menu length equals zero or nil.")
+	} else if body.menus == nil || len(body.menus) == 0 {
+		return helper.CreateHTTPError(http.StatusBadRequest, "menu is nil or its length equals zero.")
 	}
 
 	// score
@@ -113,8 +100,7 @@ func (c *CommitmentController) Post(w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to create commitment.")
 	}
-
-	return nil
+	return helper.JSON(w, http.StatusOK, nil)
 }
 
 func calcCommitmentScore(menus []model.CommitmentMenu) int {

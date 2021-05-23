@@ -41,3 +41,15 @@ func ReadConfigs(filePath string) (Configs, error) {
 	}
 	return configs, nil
 }
+
+func ConnectDB(filePath string, env string) *gorm.DB {
+	configs, err := ReadConfigs(filePath)
+	if err != nil {
+		panic(err)
+	}
+	db, err := configs.Open(env)
+	if err != nil {
+		panic(err)
+	}
+	return db
+}

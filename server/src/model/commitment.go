@@ -7,33 +7,37 @@ import (
 )
 
 type Commitment struct {
-	ID        int       `json:id`
-	UserID    string    `json:user_id`
-	Score     int       `json:score`
-	Committed time.Time `json:committed`
+	ID        int       `json:"id"`
+	UserID    string    `json:"user_id"`
+	Score     int       `json:"score"`
+	Committed time.Time `json:"committed"`
 }
 
 type CommitmentMenu struct {
-	ID           int    `json:id`
-	CommitmentID int    `json:commitment_id`
-	MenuID       string `json:menu_id`
-	Amount       string `json:amount`
+	ID           int    `json:"id"`
+	CommitmentID int    `json:"commitment_id"`
+	MenuID       string `json:"menu_id"`
+	Amount       string `json:"amount"`
 }
 
-func FetchTotalCommitmentScore(db *gorm.DB, userID string) int {
+func FetchTotalCommitmentScore(db *gorm.DB, userID string) (int, error) {
 	var result struct {
-		total int `json:total`
+		Total int `json:"total"`
 	}
-	db.Table("commitments").Select("sum(score) as total").Where("user_id", userID).First(&result)
-	return result.total
+	res := db.Table("commitments").Select("sum(score) as total").Where("user_id", userID).First(&result)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+	return result.Total, nil
 }
 
-func FetchCommitmentCount(db *gorm.DB, userID string) int {
-	var result struct {
-		count int `json:count`
+func FetchCommitmentCount(db *gorm.DB, userID string) (int64, error) {
+	var count int64
+	res := db.Table("commitments").Where("user_id", userID).Count(&count)
+	if res.Error != nil {
+		return 0, res.Error
 	}
-	db.Table("commitments").Select("count(score) as count").Where("user_id", userID).First(&result)
-	return result.count
+	return count, nil
 }
 
 func FetchCommitmentHistories(db *gorm.DB, userID string, offset int, num int) ([]Commitment, error) {
@@ -55,10 +59,10 @@ func FetchCommitmentDetail(db *gorm.DB, commitmentID int) (interface{}, error) {
 
 	// メニュー取得
 	commitmentMenuDetails := []struct {
-		ID     int    `json:id`
-		MenuID string `json:menu_id`
-		Name   string `json:name`
-		Amount string `json:amount`
+		ID     int    `json:"id"`
+		MenuID string `json:"menu_id"`
+		Name   string `json:"name"`
+		Amount string `json:"amount"`
 	}{}
 
 	res = db.Table("commitment_menus").Select("commitment_menus.id, commitment_menus.menu_id, menus.name, commitment_menu.amount").
@@ -71,7 +75,7 @@ func FetchCommitmentDetail(db *gorm.DB, commitmentID int) (interface{}, error) {
 
 	rtn := struct {
 		Commitment
-		Menus interface{} `json:menus`
+		Menus interface{} `json:"menus"`
 	}{
 		Commitment: commitment,
 		Menus:      commitmentMenuDetails,
@@ -79,7 +83,7 @@ func FetchCommitmentDetail(db *gorm.DB, commitmentID int) (interface{}, error) {
 	return rtn, nil
 }
 
-func CreateCommitment(db *gorm.DB, commitment *Commitment, menus []CommitmentMenu) error {
+func CreateCommitment(db *gorm.DB, commitment *Commitment, commitmentMenus []CommitmentMenu) error {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		// insert into commitments
 		err := db.Create(commitment).Error
@@ -87,7 +91,10 @@ func CreateCommitment(db *gorm.DB, commitment *Commitment, menus []CommitmentMen
 			return err
 		}
 		//insert into commitment_menus
-		err = db.Create(menus).Error
+		for _, menu := range commitmentMenus {
+			menu.CommitmentID = commitment.ID
+		}
+		err = db.Create(commitmentMenus).Error
 		if err != nil {
 			return err
 		}

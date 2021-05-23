@@ -4,13 +4,12 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"workout/src/model"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/form3tech-oss/jwt-go"
 )
 
-func CreateToken(user *model.User) (string, error) {
+func CreateToken(id string) (string, error) {
 
 	// Token を作成
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -20,7 +19,7 @@ func CreateToken(user *model.User) (string, error) {
 		"iat": time.Now(),
 		"exp": time.Now().Add(time.Hour * 1).Unix(),
 		// private claims
-		"id": user.ID,
+		"id": id,
 	})
 
 	signature := os.Getenv("SIGNATURE")
@@ -40,10 +39,15 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 	SigningMethod: jwt.SigningMethodHS256,
 })
 
-type handlerFunc func(w http.ResponseWriter, r *http.Request) error
-
-func AuthHandler(fn handlerFunc) http.Handler {
-	return jwtMiddleware.Handler(Handler(fn))
+func AuthHandler(fn func(w http.ResponseWriter, r *http.Request, userID string) error) http.Handler {
+	funcWithUserID := func(w http.ResponseWriter, r *http.Request) error {
+		userID, ok := GetClaim(r, "id").(string)
+		if !ok {
+			return CreateHTTPError(http.StatusInternalServerError, "failed to read user id from context")
+		}
+		return fn(w, r, userID)
+	}
+	return jwtMiddleware.Handler(Handler(funcWithUserID))
 }
 
 func GetClaim(r *http.Request, key string) interface{} {

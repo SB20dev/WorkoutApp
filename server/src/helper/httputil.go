@@ -25,5 +25,8 @@ func CreateHTTPError(status int, errorStr string) *HTTPError {
 
 func JSON(w http.ResponseWriter, code int, data interface{}) error {
 	w.WriteHeader(code)
+	if data == nil {
+		data = map[string]interface{}{}
+	}
 	return json.NewEncoder(w).Encode(data)
 }
