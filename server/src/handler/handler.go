@@ -50,6 +50,11 @@ func GetRouter(db *gorm.DB) *mux.Router {
 	userController := &controller.UserController{DB: db}
 	router.Handle("/api/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
 	router.Handle("/api/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
+	router.Handle("/api/user/checkauth", helper.AuthHandler(func(w http.ResponseWriter, r *http.Request, userID string) error {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "authorized")
+		return nil
+	})).Methods("GET")
 
 	// コミットメント
 	commitmentController := &controller.CommitmentController{DB: db}

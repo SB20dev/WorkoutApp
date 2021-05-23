@@ -52,14 +52,14 @@ func handleError(w http.ResponseWriter, r *http.Request, status int, err error) 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": errorText(err),
+			"error": err.Error(),
 		})
 		return
 	}
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(status)
-	io.WriteString(w, errorText(err))
+	io.WriteString(w, err.Error())
 }
 
 func logError(req *http.Request, err error, rv interface{}) {
@@ -72,8 +72,4 @@ func logError(req *http.Request, err error, rv interface{}) {
 		}
 		log.Print(buf.String())
 	}
-}
-
-func errorText(err error) string {
-	return fmt.Sprintf("Internal Server error : %s", err.Error())
 }

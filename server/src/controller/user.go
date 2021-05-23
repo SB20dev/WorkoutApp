@@ -27,13 +27,13 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 
 	user := model.FetchUserByID(u.DB, input.ID)
 	if user == nil {
-		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct")
+		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct.")
 	}
 
 	// パスワード照合
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct")
+		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct.")
 	}
 
 	// トークン生成

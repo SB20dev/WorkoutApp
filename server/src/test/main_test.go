@@ -6,17 +6,12 @@ import (
 	"path/filepath"
 	"testing"
 	"workout/src/db"
-	"workout/src/handler"
 
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
-var (
-	database *gorm.DB
-	router   *mux.Router
-)
+var database *gorm.DB
 
 func TestMain(m *testing.M) {
 	// before
@@ -33,7 +28,6 @@ func TestMain(m *testing.M) {
 		os.Exit(0)
 	}
 	database = db.ConnectDB(filepath.Join(projectRootDir, "db/dbconfig.yml"), env)
-	router = handler.GetRouter(database)
 
 	code := m.Run()
 
