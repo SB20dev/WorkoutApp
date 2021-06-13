@@ -1,18 +1,18 @@
 import React from 'react'
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom'
 import Top from './Top/Top'
-import SignUp from './SignUp/SignUp'
-import SignIn from './SignIn/SignIn'
 import Home from './Home/Home'
 import Commitment from './Commitment/Commitment'
 import Menu from './Menu/Menu'
 import Commit from './Commit/Commit'
 import NotFound from './NotFound/NotFound'
+import SignIn from './SignIn/SignIn'
+import SignUp from './SignUp/SignUp'
 
 export default props => (
     <Router>
         <Switch>
-            <Route path="/sign" component={SignRoute} />
+            <Route path="/sign*" component={SignRoute} />
             <Route component={ContentRoute} />
         </Switch>
     </Router>
@@ -20,8 +20,8 @@ export default props => (
 
 const SignRoute = props => (
     <Switch>
-        <Route path="/signIn" component={SignIn} />
-        <Route path="/signUp" component={SignUp} />
+        <Route path="/signup" component={SignUp} />
+        <Route path="/signin" component={SignIn} />
     </Switch>
 )
 
@@ -51,7 +51,7 @@ const ContentRoute = props => (
             <div className="nav-right">
                 <div className="fixed-button-container">
                     <div className="fixed-button">
-                        logoff
+                        <Link to="logoff">logoff</Link>
                     </div>
                     <div className="fixed-button">
                         <Link to="/commit">Commit</Link>
