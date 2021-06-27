@@ -1,91 +1,61 @@
 package handler
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-	"workout/src/controller"
+	"reflect"
+	"strings"
 	"workout/src/helper"
-
-	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
-type spaHandler struct {
-	staticPath string
-	indexPath  string
+type Handler func(w http.ResponseWriter, r *http.Request) error
+
+func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	runHandler(w, r, h, handleError)
 }
 
-func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path, err := filepath.Abs(r.URL.Path)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+type errFn func(w http.ResponseWriter, r *http.Request, err *helper.HTTPError)
+
+func runHandler(w http.ResponseWriter, r *http.Request, fn Handler, errfn errFn) {
+	defer func() {
+		if rv := recover(); rv != nil {
+			err := errors.New("handler panic")
+			helper.LogError(r, err, rv)
+			errfn(w, r, helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UnrecognizedError))
+		}
+	}()
+
+	r.Body = http.MaxBytesReader(w, r.Body, 2048)
+	r.ParseForm()
+	var buf helper.ResponseBuffer
+	err := fn(&buf, r)
+	if err == nil || reflect.ValueOf(err).IsNil() {
+		buf.WriteTo(w)
+	} else if e, ok := err.(*helper.HTTPError); ok {
+		if e.StatusCode >= 500 {
+			helper.LogError(r, err, nil)
+		}
+		errfn(w, r, e)
+	} else {
+		helper.LogError(r, err, nil)
+		errfn(w, r, helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UnrecognizedError))
 	}
-
-	path = filepath.Join(h.staticPath, path)
-
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
-		return
-	} else if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
-func GetRouter(db *gorm.DB) *mux.Router {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, "pong")
-	}).Methods("GET")
-
-	// サインイン、サインアップ
-	userController := &controller.UserController{DB: db}
-	router.Handle("/api/user/signin", helper.Handler(userController.SignIn)).Methods("POST")
-	router.Handle("/api/user/signup", helper.Handler(userController.SignUp)).Methods("POST")
-	router.Handle("/api/user/checkauth", helper.AuthHandler(func(w http.ResponseWriter, r *http.Request, userID string) error {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, "authorized")
-		return nil
-	})).Methods("GET")
-
-	// コミットメント
-	commitmentController := &controller.CommitmentController{DB: db}
-	router.Handle("/api/commitment/totalScore", helper.AuthHandler(commitmentController.GetTotalScore)).Methods("GET")
-	router.Handle("/api/commitment/count", helper.AuthHandler(commitmentController.GetCount)).Methods("GET")
-	router.Handle("/api/commitment/histories", helper.AuthHandler(commitmentController.GetHistory)).
-		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
-	router.Handle("/api/commitment/detail", helper.AuthHandler(commitmentController.GetDetail)).
-		Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
-	router.Handle("/api/commitment/post", helper.AuthHandler(commitmentController.Post)).Methods("POST")
-
-	// メニュー
-	menuController := &controller.MenuController{DB: db}
-	router.Handle("/api/menu/count", helper.AuthHandler(menuController.GetCount)).Methods("GET")
-	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetByID)).
-		Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
-	router.Handle("/api/menu/get", helper.AuthHandler(menuController.GetPartially)).
-		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
-	router.Handle("api/menu/search", helper.AuthHandler(menuController.Search)).
-		Queries("keyword", "{keyword:.+}").Methods("GET")
-	router.Handle("api/menu/post", helper.AuthHandler(menuController.Post)).Methods("POST")
-
-	dir := http.Dir(helper.GetProjectRootDir() + "public")
-	router.PathPrefix("/").Handler(
-		http.FileServer(dir))
-
-	spa := spaHandler{
-		staticPath: filepath.Join(helper.GetProjectRootDir(), "public"),
-		indexPath:  "index.html",
+func handleError(w http.ResponseWriter, r *http.Request, err *helper.HTTPError) {
+	if strings.Contains(r.Header.Get("Content-Type"), "application/json") {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(err.StatusCode)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"errorCodes": err.ErrorCodes,
+			"error":      err.Error(),
+		})
+		return
 	}
-	router.PathPrefix("/").Handler(spa)
 
-	return router
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(err.StatusCode)
+	io.WriteString(w, err.Error())
 }
