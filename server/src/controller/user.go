@@ -49,10 +49,14 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UserError)
 	}
 
-	rtn := map[string]string{
-		"token": tokenStr,
+	// tokenをcookieに設定
+	cookie := &http.Cookie{
+		Name:  "token",
+		Value: tokenStr,
 	}
-	return helper.JSON(w, http.StatusOK, rtn)
+	http.SetCookie(w, cookie)
+
+	return helper.JSON(w, http.StatusOK, nil)
 }
 
 func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
