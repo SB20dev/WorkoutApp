@@ -1,13 +1,14 @@
 import axios from 'axios'
 import { put, call, delay, takeEvery, takeLatest, fork } from 'redux-saga/effects'
 import { ActionTypes } from '../actions/SignIn'
+import { baseURI } from '../common'
 
-const url = 'http://localhost:8082/api/user/';
+const url = new URL('/api/user', baseURI).href;
 
 const API = {
     requestSignIn: (userdata) => {
         console.log(`CALL_API SIGNIN ID:${userdata.id} PW:${userdata.pw}`)
-        return axios.post(url + 'signin', {
+        return axios.post(url + '/signin', {
             id: userdata.id,
             password: userdata.pw
         })
