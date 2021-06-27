@@ -63,6 +63,8 @@ func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
 	var input model.User
 	json.NewDecoder(r.Body).Decode(&input)
 
+	helper.Logf(r, "%v", input)
+
 	// 入力のバリデーション
 	if err := validateInputs(input); err != nil {
 		return err

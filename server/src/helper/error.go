@@ -20,18 +20,18 @@ func (err *HTTPError) Error() string {
 }
 
 func CreateHTTPErrorWithCode(status, errorCode int) *HTTPError {
-	return &HTTPError{StatusCode: status, ErrorCodes: []int{errorCode}, Err: errors.New(errorMap[errorCode])}
+	return &HTTPError{StatusCode: status, ErrorCodes: []int{errorCode}, Err: errors.New(ErrorMap[errorCode])}
 }
 
 func CreateHTTPErrorWithCodes(status int, errorCodes []int) *HTTPError {
-	return &HTTPError{StatusCode: status, ErrorCodes: errorCodes, Err: errors.New(getErrorStr(errorCodes))}
+	return &HTTPError{StatusCode: status, ErrorCodes: errorCodes, Err: errors.New(GetErrorStr(errorCodes))}
 }
 
 func CreateHTTPErrorWithMessage(status int, errorStr string) *HTTPError {
 	return &HTTPError{StatusCode: status, ErrorCodes: []int{UnrecognizedError}, Err: errors.New(errorStr)}
 }
 
-var errorMap = map[int]string{
+var ErrorMap = map[int]string{
 	// 汎用
 	InvalidQueryParameter: "Query parameter is invalid.",
 	InvalidRequestBody:    "Request body is invalid.",
@@ -79,10 +79,10 @@ const (
 	CreationCommitmentFailure        = 405
 )
 
-func getErrorStr(errorCodes []int) string {
+func GetErrorStr(errorCodes []int) string {
 	errorStr := make([]string, len(errorCodes))
 	for idx, code := range errorCodes {
-		value, exists := errorMap[code]
+		value, exists := ErrorMap[code]
 		if exists {
 			errorStr[idx] = value
 		}

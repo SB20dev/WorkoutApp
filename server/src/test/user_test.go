@@ -2,13 +2,13 @@ package test
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"workout/src/handler"
+	"workout/src/helper"
 	"workout/src/model"
 )
 
@@ -72,25 +72,25 @@ func TestSignUpFailure(t *testing.T) {
 			userID:       "",
 			password:     "fugafuga12",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "ID is empty." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserId}),
 		},
 		{
 			userID:       "hoge",
 			password:     "fugafuga12",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "length of ID must be from 8 to 72." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserId}),
 		},
 		{
 			userID:       "hogehoge12",
 			password:     "",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "Password is empty." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserPassword}),
 		},
 		{
 			userID:       "hogehoge12",
 			password:     "fuga",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "length of Password must be from 8 to 72." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserPassword}),
 		},
 	}
 
@@ -159,12 +159,11 @@ func TestSignInSuccess(t *testing.T) {
 			status, successData.expectedCode)
 	}
 	// 認証確認
-	var respBody map[string]string
-	json.Unmarshal([]byte(rr.Body.String()), &respBody)
+	token := strings.Split(rr.Header().Get("Set-Cookie"), "=")[1]
 
 	req, err = http.NewRequest("GET", "/api/user/checkauth", nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("bearer %s", respBody["token"]))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,37 +203,37 @@ func TestSignInFailure(t *testing.T) {
 			userID:       "",
 			password:     "fugafuga12",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "ID is empty." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserId}),
 		},
 		{
 			userID:       "hoge",
 			password:     "fugafuga12",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "length of ID must be from 8 to 72." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserId}),
 		},
 		{
 			userID:       "hogehoge12",
 			password:     "",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "Password is empty." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserPassword}),
 		},
 		{
 			userID:       "hogehoge12",
 			password:     "fuga",
 			expectedCode: http.StatusBadRequest,
-			expectedBody: `{ "error" : "length of Password must be from 8 to 72." }`,
+			expectedBody: GetErrorResponseBody(http.StatusBadRequest, []int{helper.InvalidUserPassword}),
 		},
 		{
 			userID:       "hogehoge123",
 			password:     "fugafuga12",
 			expectedCode: http.StatusUnauthorized,
-			expectedBody: `{ "error" : "ID or password is not correct." }`,
+			expectedBody: GetErrorResponseBody(http.StatusUnauthorized, []int{helper.IncorrectUserIdOrPassword}),
 		},
 		{
 			userID:       "hogehoge12",
 			password:     "fugafuga123",
 			expectedCode: http.StatusUnauthorized,
-			expectedBody: `{ "error" : "ID or password is not correct." }`,
+			expectedBody: GetErrorResponseBody(http.StatusUnauthorized, []int{helper.IncorrectUserIdOrPassword}),
 		},
 	}
 	for _, errorData := range errorDatas {
@@ -262,21 +261,4 @@ func TestSignInFailure(t *testing.T) {
 	}
 
 	tx.Rollback()
-}
-
-func checkJsonEquality(jsonStr1, jsonStr2 string) bool {
-	// Unmarshal
-	var json1, json2 map[string]string
-	json.Unmarshal([]byte(jsonStr1), &json1)
-	json.Unmarshal([]byte(jsonStr2), &json2)
-
-	// 等価判定
-	equality := true
-	for key, value := range json1 {
-		if value != json2[key] {
-			equality = false
-			break
-		}
-	}
-	return equality
 }
