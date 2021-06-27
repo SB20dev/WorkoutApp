@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 	"workout/src/helper"
@@ -27,25 +26,27 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 
 	user := model.FetchUserByID(u.DB, input.ID)
 	if user == nil {
-		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct.")
+		return helper.CreateHTTPErrorWithCode(http.StatusUnauthorized, helper.IncorrectUserIdOrPassword)
 	}
 
 	// パスワード照合
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusUnauthorized, "ID or password is not correct.")
+		return helper.CreateHTTPErrorWithCode(http.StatusUnauthorized, helper.IncorrectUserIdOrPassword)
 	}
 
 	// トークン生成
 	tokenStr, err := helper.CreateToken(user.ID)
 	if err != nil {
-		return err
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UserError)
 	}
 
 	// 最終ログイン日時の更新
 	result := model.UpdateLastLogin(u.DB, input.ID)
 	if err := result.Error; err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, err.Error())
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UserError)
 	}
 
 	rtn := map[string]string{
@@ -55,26 +56,34 @@ func (u *UserController) SignIn(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
-	var user model.User
-	json.NewDecoder(r.Body).Decode(&user)
+	var input model.User
+	json.NewDecoder(r.Body).Decode(&input)
 
 	// 入力のバリデーション
-	if err := validateInputs(user); err != nil {
+	if err := validateInputs(input); err != nil {
 		return err
 	}
 
-	user.Created = time.Now()
-	// パスワード暗号化
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "password hash error")
+	// IDの重複チェック
+	user := model.FetchUserByID(u.DB, input.ID)
+	if user == nil {
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.DuplicatedUserId)
 	}
-	user.Password = string(hash)
+
+	input.Created = time.Now()
+	// パスワード暗号化
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
+	if err != nil {
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UserError)
+	}
+	input.Password = string(hash)
 
 	// DB格納
-	err = model.CreateUser(u.DB, &user)
+	err = model.CreateUser(u.DB, &input)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, err.Error())
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.UserError)
 	}
 
 	return helper.JSON(w, http.StatusOK, nil)
@@ -82,37 +91,22 @@ func (u *UserController) SignUp(w http.ResponseWriter, r *http.Request) error {
 
 func validateInputs(user model.User) error {
 
-	addErrorStr := func(str string, addition string) string {
-		if str != "" {
-			return str + " " + addition
-		}
-		return addition
-	}
-
 	const (
 		minLength int = 8
 		maxLength int = 72
 	)
 
-	isInvalid := false
-	errorStr := ""
-	if user.ID == "" {
-		errorStr += "ID is empty."
-		isInvalid = true
-	} else if len(user.ID) > maxLength || len(user.ID) < minLength {
-		errorStr += fmt.Sprintf("length of ID must be from %d to %d.", minLength, maxLength)
-		isInvalid = true
-	}
-	if user.Password == "" {
-		errorStr = addErrorStr(errorStr, "Password is empty.")
-		isInvalid = true
-	} else if len(user.Password) > maxLength || len(user.Password) < minLength {
-		errorStr = addErrorStr(errorStr, fmt.Sprintf("length of Password must be from %d to %d.", minLength, maxLength))
-		isInvalid = true
+	errorCodes := []int{}
+	if len(user.ID) > maxLength || len(user.ID) < minLength {
+		errorCodes = append(errorCodes, helper.InvalidUserId)
 	}
 
-	if !isInvalid {
-		return nil
+	if len(user.Password) > maxLength || len(user.Password) < minLength {
+		errorCodes = append(errorCodes, helper.InvalidUserPassword)
 	}
-	return helper.CreateHTTPError(http.StatusBadRequest, errorStr)
+
+	if len(errorCodes) > 0 {
+		return helper.CreateHTTPErrorWithCodes(http.StatusBadRequest, errorCodes)
+	}
+	return nil
 }
