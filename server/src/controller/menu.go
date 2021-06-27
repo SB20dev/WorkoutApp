@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"workout/src/helper"
@@ -17,7 +18,8 @@ type MenuController struct {
 func (c *MenuController) GetCount(w http.ResponseWriter, r *http.Request, userID string) error {
 	count, err := model.FetchMenuCount(c.DB, userID)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch count.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.FetchMenuCountFailure)
 	}
 
 	rtn := map[string]int64{
@@ -30,12 +32,14 @@ func (c *MenuController) GetByID(w http.ResponseWriter, r *http.Request, userID 
 	q := r.URL.Query()
 	id, err := strconv.Atoi(q.Get("menu_id"))
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusBadRequest, "query parameter is invalid. convertion failed.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusBadRequest, helper.InvalidQueryParameter)
 	}
 
 	menu, err := model.FetchMenuByID(c.DB, id)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch menu.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.FetchMenuFailure)
 	}
 
 	return helper.JSON(w, http.StatusOK, menu)
@@ -45,14 +49,21 @@ func (c *MenuController) GetPartially(w http.ResponseWriter, r *http.Request, us
 	// offset, num
 	q := r.URL.Query()
 	offset, offsetErr := strconv.Atoi(q.Get("offset"))
+	if offsetErr != nil {
+		helper.LogError(r, offsetErr, nil)
+	}
 	num, numErr := strconv.Atoi(q.Get("num"))
+	if numErr != nil {
+		helper.LogError(r, numErr, nil)
+	}
 	if offsetErr != nil || numErr != nil {
-		return helper.CreateHTTPError(http.StatusBadRequest, "query parameter is invalid. convertion failed.")
+		return helper.CreateHTTPErrorWithCode(http.StatusBadRequest, helper.InvalidQueryParameter)
 	}
 
 	menus, err := model.FetchMenus(c.DB, userID, offset, num)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to fetch menus.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.FetchMenuFailure)
 	}
 
 	rtn := map[string](interface{}){
@@ -67,11 +78,13 @@ func (c *MenuController) Search(w http.ResponseWriter, r *http.Request, userID s
 	keyword := q.Get("keyword")
 	limit, err := strconv.Atoi(q.Get("limit"))
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusBadRequest, "query parameter is invalid. conversion failed.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusBadRequest, helper.InvalidQueryParameter)
 	}
 	menus, err := model.SearchMenus(c.DB, userID, keyword, limit)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to search menus.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.FetchMenuFailure)
 	}
 
 	rtn := map[string](interface{}){
@@ -88,12 +101,13 @@ func (c *MenuController) Post(w http.ResponseWriter, r *http.Request, userID str
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusBadRequest, "request body is invalid. parse failed")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusBadRequest, helper.InvalidRequestBody)
 	} else if body.Name == "" || body.Parts == nil || len(body.Parts) == 0 {
-		return helper.CreateHTTPError(http.StatusBadRequest, "menu name or parts is empty.")
+		helper.LogError(r, errors.New("Menu name or parts is empty."), nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusBadRequest, helper.InvalidRequestBody)
 	}
 
-	// menu
 	menu := model.Menu{
 		UserID: userID,
 		Name:   body.Name,
@@ -101,7 +115,8 @@ func (c *MenuController) Post(w http.ResponseWriter, r *http.Request, userID str
 
 	err = model.CreateMenus(c.DB, &menu, body.Parts)
 	if err != nil {
-		return helper.CreateHTTPError(http.StatusInternalServerError, "failed to create menu.")
+		helper.LogError(r, err, nil)
+		return helper.CreateHTTPErrorWithCode(http.StatusInternalServerError, helper.CreationMenuFailure)
 	}
 
 	return nil
