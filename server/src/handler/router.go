@@ -77,10 +77,6 @@ func GetRouter(db *gorm.DB) *mux.Router {
 		Queries("keyword", "{keyword:.+}").Methods("GET")
 	router.Handle("api/menu/post", AuthHandler(menuController.Post)).Methods("POST")
 
-	dir := http.Dir(helper.GetProjectRootDir() + "public")
-	router.PathPrefix("/").Handler(
-		http.FileServer(dir))
-
 	spa := spaHandler{
 		staticPath: filepath.Join(helper.GetProjectRootDir(), "public"),
 		indexPath:  "index.html",
