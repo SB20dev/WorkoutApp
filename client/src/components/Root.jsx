@@ -8,6 +8,7 @@ import Commit from './Commit/Commit'
 import NotFound from './NotFound/NotFound'
 import SignIn from './SignIn/SignIn'
 import SignUp from './SignUp/SignUp'
+import SignOut from './SignOut/SignOut'
 import { connect } from "react-redux";
 
 class Root extends React.Component {
@@ -31,8 +32,9 @@ class Root extends React.Component {
 
 const SignRoute = props => (
   <Switch>
-    <Route path="/signup" component={SignUp} />
-    <Route path="/signin" component={SignIn} />
+    <Route path="/signup"  component={SignUp} />
+    <Route path="/signin"  component={SignIn} />
+    <Route path="/signout" component={SignOut}/>
   </Switch>
 )
 

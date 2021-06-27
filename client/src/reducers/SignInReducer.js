@@ -8,7 +8,7 @@ const initialState = {
 }
 
 export default (state = initialState, action) => {
-
+    console.log(action);
     switch (action.type) {
         case ActionTypes.SUCCESSED_SIGNIN:
             document.cookie = 'token=' + action.data.data.token
@@ -22,6 +22,11 @@ export default (state = initialState, action) => {
                 ...state,
                 success_signin: false,
                 failed_signin_reason: action.error,
+            }
+        case ActionTypes.REQUEST_SIGNOUT:
+            document.cookie = ''
+            return {
+                success_signin: false,
             }
         default:
             return state

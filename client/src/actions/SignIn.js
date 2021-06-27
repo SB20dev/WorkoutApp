@@ -2,6 +2,8 @@ export const ActionTypes = {
     REQUEST_SIGNIN: 'REQUEST_SIGNIN',
     SUCCESSED_SIGNIN: 'SUCCESSED_SIGNIN',
     FAILED_SIGNIN: 'FAILED_SIGNIN',
+
+    REQUEST_SIGNOUT: 'REQUEST_SIGNOUT',
 }
 
 export const Actions = {
@@ -16,5 +18,9 @@ export const Actions = {
     failedSignIn: (error) => ({
         type: ActionTypes.FAILED_SIGNIN,
         error
+    }),
+
+    requestSignOut: () => ({
+        type: ActionTypes.REQUEST_SIGNOUT
     })
 }

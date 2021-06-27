@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { Actions } from "../../actions/SignIn";
 
 class SignOut extends React.Component {
   constructor(props) {
@@ -10,6 +11,7 @@ class SignOut extends React.Component {
   render() {
     return (
       <>
+        {!this.props.success_signin && <Redirect to="/" />}
         <div className="signout-form">
           <h1>SignOut Form</h1>
           <button type="button" onClick={() => { this.props.signOut(); }} >
@@ -21,10 +23,14 @@ class SignOut extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  success_signin: state.signIn.success_signin,
+});
+
 const mapDispatchToProps = (dispatch) => ({
   signOut: () => {
     dispatch(Actions.requestSignOut());
   },
 });
 
-export default connect(mapDispatchToProps)(SignOut);
+export default connect(mapStateToProps, mapDispatchToProps)(SignOut);
