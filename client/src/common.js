@@ -1,0 +1,1 @@
+export const baseURI = window.location.href
