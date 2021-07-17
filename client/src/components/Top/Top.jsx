@@ -12,9 +12,7 @@ class Top extends React.Component {
     return (
       <>
         {this.props.success_signin ?
-          <>
-            <h1>You are login.<br /> Let's begin traning.</h1>
-          </>
+          <h1>You are login.<br /> Let's begin training.</h1>
           :
           <>
             <Link to="/signup">

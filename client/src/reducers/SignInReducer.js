@@ -3,7 +3,6 @@ import { ActionTypes } from '../actions/SignIn';
 const initialState = {
     success_signin: undefined,
     failed_signin_reason: undefined,
-    success_signin: undefined,
     user_token: undefined
 }
 
