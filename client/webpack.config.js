@@ -27,7 +27,12 @@ module.exports = {
     extensions: ['.js', '.jsx'],
   },
   devServer: {
-      port:3000
+    port:3000,
+    proxy: {
+      '/api': {
+          target: 'http://localhost:8082',
+      }
+    }
   },
   devtool: 'source-map',
   plugins: [
