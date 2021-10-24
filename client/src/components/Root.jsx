@@ -9,7 +9,8 @@ import NotFound from './NotFound/NotFound'
 import SignIn from './SignIn/SignIn'
 import SignUp from './SignUp/SignUp'
 import SignOut from './SignOut/SignOut'
-import { connect } from "react-redux";
+import Parts from './Parts/Parts'
+import { connect } from 'react-redux'
 
 class Root extends React.Component {
   constructor(props) {
@@ -38,8 +39,9 @@ const SignRoute = props => (
   </Switch>
 )
 
-const ContentRoute = props => (
+const ContentRoute = (props) => (
   <div>
+    <div id="fullOverlay"></div>
     <nav>
       <div className="nav-left">
         <div className="logo">
@@ -55,6 +57,9 @@ const ContentRoute = props => (
             </li>
             <li>
               <Link to="/menu">Menu</Link>
+            </li>
+            <li>
+              <Link to="/parts">Parts</Link>
             </li>
             <li>State</li>
             <li>Profile</li>
@@ -81,12 +86,13 @@ const ContentRoute = props => (
           <Route path="/commitment" component={Commitment} />
           <Route path="/menu" component={Menu} />
           <Route exact path="/commit" component={Commit} />
+          <Route path="/parts" component={Parts} />
           <Route component={NotFound} />
         </Switch>
       </div>
     </div>
   </div>
-)
+);
 
 const mapStateToProps = (state) => ({
   success_signin: state.signIn.success_signin
