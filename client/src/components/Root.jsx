@@ -24,7 +24,7 @@ class Root extends React.Component {
         <Router>
           <Route component={ContentRoute} />
         </Router>
-        {!this.props.success_signin && <SignUpIn />}
+        {/* {!this.props.success_signin && <SignUpIn />} */}
       </>
     )
   }

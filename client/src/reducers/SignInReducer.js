@@ -9,6 +9,7 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case ActionTypes.SUCCESSED_SIGNIN:
+            console.log(action)
             return {
                 ...state,
                 success_signin: true,

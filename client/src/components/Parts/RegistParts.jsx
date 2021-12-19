@@ -8,14 +8,15 @@ class RegistParts extends React.Component {
     super(props)
     this.state = { isShow: false }
   }
-
-
+  
+  
   render() {
-    console.log(this.state)
+    console.log("regist parts " + this.state)
 
     return (
       <RegistWindow>
-
+        <h3>hogehog</h3>
+        <></>
       </RegistWindow>
     )
   }
