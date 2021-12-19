@@ -17,7 +17,7 @@ func JSON(w http.ResponseWriter, code int, data interface{}) error {
 	return json.NewEncoder(w).Encode(data)
 }
 
-func CreateToken(id string) (string, error) {
+func CreateToken(userSystemID int64) (string, error) {
 
 	// Token を作成
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -27,7 +27,7 @@ func CreateToken(id string) (string, error) {
 		"iat": time.Now(),
 		"exp": time.Now().Add(time.Hour * 1).Unix(),
 		// private claims
-		"id": id,
+		"id": userSystemID,
 	})
 
 	signature := os.Getenv("SIGNATURE")

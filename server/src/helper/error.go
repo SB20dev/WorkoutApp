@@ -42,16 +42,29 @@ var ErrorMap = map[int]string{
 	DuplicatedUserId:          "User ID is duplicated.",
 	IncorrectUserIdOrPassword: "User ID or password is not correct.",
 	// メニュー系
-	MenuError:             "Error about menus.",
-	FetchMenuCountFailure: "Failed to fetch Menu count.",
-	FetchMenuFailure:      "Failed to fetch Menus.",
-	CreationMenuFailure:   "Failed to create Menus.",
+	MenuError:              "Error about menus.",
+	FetchMenusCountFailure: "Failed to fetch menus count.",
+	FetchMenuFailure:       "Failed to fetch menus.",
+	CreateMenuFailure:      "Failed to create menus.",
 	// コミットメント系
 	CommitmentError:                  "Error about commitments.",
 	FetchTotalCommitmentScoreFailure: "Failed to fetch total commitment score.",
-	FetchCommitmentCountFailure:      "Failed to fetch commitment count.",
-	FetchCommitmentHistoryFailure:    "Failed to fetch commitment histories.",
+	FetchCommitmentsCountFailure:     "Failed to fetch commitments count.",
+	FetchCommitmentsFailure:          "Failed to fetch commitment histories.",
 	FetchCommitmentDetailFailure:     "Failed to fetch commitment details.",
+	CreateCommitmentFailure:          "Failed to create commitment.",
+	// パーツ系
+	PartError:              "Error about parts.",
+	FetchPartsCountFailure: "Failed to fetch parts count.",
+	FetchPartsFailure:      "Failed to fetch parts.",
+	CreatePartFailure:      "Failed to create part.",
+	UpdatePartFailure:      "Failed to update part.",
+	DeletePartFailure:      "Failed to delete part.",
+	FetchClassesFailure:    "Failed to fetch classes.",
+	CreateClassFailure:     "Failed to create class.",
+	UpdateClassFailure:     "Failed to update class.",
+	DeleteClassFailure:     "Failed to delete class.",
+	FetchStatusFailure:     "Failed to fetch status.",
 }
 
 const (
@@ -66,17 +79,29 @@ const (
 	DuplicatedUserId          = 203
 	IncorrectUserIdOrPassword = 204
 	// メニュー系
-	MenuError             = 300
-	FetchMenuCountFailure = 301
-	FetchMenuFailure      = 302
-	CreationMenuFailure   = 303
+	MenuError              = 300
+	FetchMenusCountFailure = 301
+	FetchMenuFailure       = 302
+	CreateMenuFailure      = 303
 	// コミットメント系
 	CommitmentError                  = 400
 	FetchTotalCommitmentScoreFailure = 401
-	FetchCommitmentCountFailure      = 402
-	FetchCommitmentHistoryFailure    = 403
+	FetchCommitmentsCountFailure     = 402
+	FetchCommitmentsFailure          = 403
 	FetchCommitmentDetailFailure     = 404
-	CreationCommitmentFailure        = 405
+	CreateCommitmentFailure          = 405
+	// パーツ系
+	PartError              = 500
+	FetchPartsCountFailure = 501
+	FetchPartsFailure      = 502
+	CreatePartFailure      = 503
+	UpdatePartFailure      = 504
+	DeletePartFailure      = 505
+	FetchClassesFailure    = 506
+	CreateClassFailure     = 507
+	UpdateClassFailure     = 508
+	DeleteClassFailure     = 509
+	FetchStatusFailure     = 510
 )
 
 func GetErrorStr(errorCodes []int) string {

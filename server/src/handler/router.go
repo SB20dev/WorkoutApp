@@ -50,32 +50,45 @@ func GetRouter(db *gorm.DB) *mux.Router {
 	userController := &controller.UserController{DB: db}
 	router.Handle("/api/user/signin", Handler(userController.SignIn)).Methods("POST")
 	router.Handle("/api/user/signup", Handler(userController.SignUp)).Methods("POST")
-	router.Handle("/api/user/checkauth", AuthHandler(func(w http.ResponseWriter, r *http.Request, userID string) error {
+	router.Handle("/api/user/checkauth", AuthHandler(func(w http.ResponseWriter, r *http.Request, userID int64) error {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "authorized")
 		return nil
 	})).Methods("GET")
 
-	// コミットメント
-	commitmentController := &controller.CommitmentController{DB: db}
-	router.Handle("/api/commitment/totalScore", AuthHandler(commitmentController.GetTotalScore)).Methods("GET")
-	router.Handle("/api/commitment/count", AuthHandler(commitmentController.GetCount)).Methods("GET")
-	router.Handle("/api/commitment/histories", AuthHandler(commitmentController.GetHistory)).
-		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
-	router.Handle("/api/commitment/detail", AuthHandler(commitmentController.GetDetail)).
-		Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
-	router.Handle("/api/commitment/post", AuthHandler(commitmentController.Post)).Methods("POST")
+	// // コミットメント
+	// commitmentController := &controller.CommitmentController{DB: db}
+	// router.Handle("/api/commitment/totalScore", AuthHandler(commitmentController.GetTotalScore)).Methods("GET")
+	// router.Handle("/api/commitment/count", AuthHandler(commitmentController.GetCount)).Methods("GET")
+	// router.Handle("/api/commitment/get", AuthHandler(commitmentController.GetPartially)).
+	// 	Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
+	// router.Handle("/api/commitment/detail", AuthHandler(commitmentController.GetDetail)).
+	// 	Queries("commitment_id", "{commitment_id:[0-9]+}").Methods("GET")
+	// router.Handle("/api/commitment/post", AuthHandler(commitmentController.Post)).Methods("POST")
 
-	// メニュー
-	menuController := &controller.MenuController{DB: db}
-	router.Handle("/api/menu/count", AuthHandler(menuController.GetCount)).Methods("GET")
-	router.Handle("/api/menu/get", AuthHandler(menuController.GetByID)).
-		Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
-	router.Handle("/api/menu/get", AuthHandler(menuController.GetPartially)).
-		Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
-	router.Handle("api/menu/search", AuthHandler(menuController.Search)).
-		Queries("keyword", "{keyword:.+}").Methods("GET")
-	router.Handle("api/menu/post", AuthHandler(menuController.Post)).Methods("POST")
+	// // メニュー
+	// menuController := &controller.MenuController{DB: db}
+	// router.Handle("/api/menu/count", AuthHandler(menuController.GetCount)).Methods("GET")
+	// router.Handle("/api/menu/get", AuthHandler(menuController.GetByID)).
+	// 	Queries("menu_id", "{menu_id:[0-9]+}").Methods("GET")
+	// router.Handle("/api/menu/get", AuthHandler(menuController.GetPartially)).
+	// 	Queries("offset", "{offset:[0-9]+}", "num", "{num:[1-9][0-9]*}").Methods("GET")
+	// router.Handle("api/menu/search", AuthHandler(menuController.Search)).
+	// 	Queries("keyword", "{keyword:.+}").Methods("GET")
+	// router.Handle("api/menu/post", AuthHandler(menuController.Post)).Methods("POST")
+
+	// パーツ
+	partController := &controller.PartController{DB: db}
+	router.Handle("/api/parts/count", AuthHandler(partController.GetPartsCount)).Methods("GET")
+	router.Handle("/api/part/get", AuthHandler(partController.GetParts)).Queries("page", "{page:[1-9][0-9]*}", "per_page", "{per_page:[1-9][0-9]*}", "filter_classes", "{filter_classes:[1-9][0-9]*(\\|[1-9][0-9]*)*}", "filter_status", "{filter_status:[1-9][0-9]*(\\|[1-9][0-9]*)*}").Methods("GET")
+	router.Handle("/api/part/post", AuthHandler(partController.PostPart)).Methods("POST")
+	router.Handle("/api/part/patch/{id:[1-9][0-9]*}", AuthHandler(partController.PatchPart)).Methods("PATCH")
+	router.Handle("/api/part/delete/{id:[1-9][0-9]*}", AuthHandler(partController.DeletePart)).Methods("DELETE")
+	router.Handle("/api/class/get", AuthHandler(partController.GetClasses)).Methods("GET")
+	router.Handle("/api/class/post", AuthHandler(partController.PostClass)).Methods("POST")
+	router.Handle("/api/class/patch/{id:[1-9][0-9]*}", AuthHandler(partController.PatchClass)).Methods("PATCH")
+	router.Handle("/api/class/delete/{id:[1-9][0-9]*}", AuthHandler(partController.DeleteClass)).Methods("DELETE")
+	router.Handle("/api/state/get", AuthHandler(partController.GetStatus)).Methods("GET")
 
 	spa := spaHandler{
 		staticPath: filepath.Join(helper.GetProjectRootDir(), "public"),

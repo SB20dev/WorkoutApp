@@ -7,6 +7,7 @@ import (
 )
 
 type User struct {
+	SystemID  int64     `json:"system_id"`
 	ID        string    `json:"id"`
 	Password  string    `json:"password"`
 	LastLogin time.Time `json:"last_login"`
@@ -14,7 +15,21 @@ type User struct {
 }
 
 func CreateUser(db *gorm.DB, user *User) error {
-	return db.Create(user).Error
+	err := db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Create(user).Error
+		if err != nil {
+			return err
+		}
+		err = DuplicateCommonRecords(db, user.SystemID)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func FetchUserByID(db *gorm.DB, id string) *User {
