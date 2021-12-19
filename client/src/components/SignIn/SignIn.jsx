@@ -1,7 +1,6 @@
 import React from "react";
 import { Actions } from "../../actions/SignIn";
 import { connect } from "react-redux";
-import Root from "../Root";
 import { Redirect } from "react-router-dom";
 
 class SignIn extends React.Component {

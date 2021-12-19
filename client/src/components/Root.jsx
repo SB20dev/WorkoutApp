@@ -11,6 +11,7 @@ import SignUp from './SignUp/SignUp'
 import SignOut from './SignOut/SignOut'
 import Parts from './Parts/Parts'
 import { connect } from 'react-redux'
+import SignUpIn from './SignCommon/SignUpIn'
 
 class Root extends React.Component {
   constructor(props) {
@@ -19,25 +20,15 @@ class Root extends React.Component {
 
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route path="/sign*" component={SignRoute} />
+      <>
+        <Router>
           <Route component={ContentRoute} />
-        </Switch>
-      </Router>
-
+        </Router>
+        {!this.props.success_signin && <SignUpIn />}
+      </>
     )
   }
 }
-
-
-const SignRoute = props => (
-  <Switch>
-    <Route path="/signup"  component={SignUp} />
-    <Route path="/signin"  component={SignIn} />
-    <Route path="/signout" component={SignOut}/>
-  </Switch>
-)
 
 const ContentRoute = (props) => (
   <div>
@@ -81,13 +72,15 @@ const ContentRoute = (props) => (
     <div className="main-container">
       <div className="main">
         <Switch>
-          <Route exact path="/" component={Top} />
-          <Route path="/home" component={Home} />
-          <Route path="/commitment" component={Commitment} />
-          <Route path="/menu" component={Menu} />
-          <Route exact path="/commit" component={Commit} />
-          <Route path="/parts" component={Parts} />
-          <Route component={NotFound} />
+          <>
+            <Route exact path="/" component={Top} />
+            <Route path="/home" component={Home} />
+            <Route path="/commitment" component={Commitment} />
+            <Route path="/menu" component={Menu} />
+            <Route exact path="/commit" component={Commit} />
+            <Route path="/parts" component={Parts} />
+            <Route component={NotFound} />
+          </>
         </Switch>
       </div>
     </div>

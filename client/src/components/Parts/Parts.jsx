@@ -2,14 +2,14 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Modal from '../Common/Modal'
-
+import RegistParts from './RegistParts'
 class Parts extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {isShow: false}
+    this.state = { isShow: false }
   }
 
-  
+
   render() {
     console.log(this.state)
 
@@ -18,8 +18,10 @@ class Parts extends React.Component {
 
     return (
       <>
-        <button type='button' onClick={() => changeState('isShow', true)}>regist parts</button> 
-        {this.state.isShow && <Modal changeState={()=> changeState('isShow',false) } />}
+        <button type='button' onClick={() => changeState('isShow', true)}>regist parts</button>
+        {this.state.isShow && <Modal changeState={() => changeState('isShow', false)} >
+          <RegistParts />
+        </Modal>}
       </>
     )
   }
@@ -27,7 +29,6 @@ class Parts extends React.Component {
 
 const mapStateToProps = (state) => ({
 
-//  success_signin: state.signIn.success_signin,
 })
 
 export default connect(mapStateToProps)(Parts)
